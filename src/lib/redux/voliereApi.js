@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 function resolveApiBaseUrl() {
-  const raw = import.meta.env.VITE_API_URL?.trim?.();
+  const raw = import.meta.env.VITE_API_URL?.trim();
 
   if (!raw) {
     throw new Error("VITE_API_URL is missing");
@@ -10,7 +10,7 @@ function resolveApiBaseUrl() {
   return raw.replace(/\/+$/, "");
 }
 
-const baseUrl = resolveApiBaseUrl();
+const baseUrl = `${resolveApiBaseUrl()}/api`;
 function unwrapPaginated(response) {
     if (Array.isArray(response))
         return response;
