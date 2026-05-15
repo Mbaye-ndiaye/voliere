@@ -70,6 +70,7 @@ function CoupleForm({ onClose }) {
     const usedIds = new Set(couples.filter((c) => c.active).flatMap((c) => [c.male, c.female]));
     const males = pigeons.filter((p) => p.sex === "M" && p.status === "actif" && !usedIds.has(p.id));
     const femelles = pigeons.filter((p) => p.sex === "F" && p.status === "actif" && !usedIds.has(p.id));
+    console.log("couples", couples);
     const [maleId, setMaleId] = useState("");
     const [femaleId, setFemaleId] = useState("");
     const [date, setDate] = useState(new Date().toISOString().slice(0, 10));

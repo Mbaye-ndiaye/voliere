@@ -180,7 +180,6 @@ export const voliereApi = createApi({
                     pigeon: body.pigeon,
                     type: body.type,
                     date: body.date,
-                    /* Django : CharField sans null=True — chaîne vide, pas null. */
                     buyer: body.buyer === undefined || body.buyer === null || String(body.buyer).trim() === ""
                         ? ""
                         : String(body.buyer),
