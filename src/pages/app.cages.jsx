@@ -95,8 +95,8 @@ export default function CagesPage() {
       // Appel API pour créer la cage
       await addCage({
         code: newCageCode,
-        pigeon: newCagePigeon ? parseInt(newCagePigeon, 10) : null,
-        couple: newCageCouple ? parseInt(newCageCouple, 10) : null,
+        pigeon_id: newCagePigeon ? parseInt(newCagePigeon, 10) : null,
+        couple_id: newCageCouple ? parseInt(newCageCouple, 10) : null,
       }).unwrap();
       
       // Réinitialiser le formulaire
@@ -116,8 +116,8 @@ export default function CagesPage() {
       await updateCage({
         id: cageId,
         patch: { 
-          pigeon: pigeonId,
-          couple: null // On enlève le couple si présent
+          pigeon_id: pigeonId,
+          couple_id: null // On enlève le couple si présent
         }
       }).unwrap();
       await refetch();
@@ -133,8 +133,8 @@ export default function CagesPage() {
       await updateCage({
         id: cageId,
         patch: { 
-          couple: coupleId,
-          pigeon: null // On enlève le pigeon si présent
+          couple_id: coupleId,
+          pigeon_id: null // On enlève le pigeon si présent
         }
       }).unwrap();
       await refetch();
@@ -150,8 +150,8 @@ export default function CagesPage() {
       await updateCage({
         id: cageId,
         patch: { 
-          pigeon: null,
-          couple: null
+          pigeon_id: null,
+          couple_id: null
         }
       }).unwrap();
       await refetch();

@@ -204,8 +204,8 @@ export const voliereApi = createApi({
                 method: "POST",
                 body: {
                     code: body.code,
-                    pigeon: body.pigeon ?? null,
-                    couple: body.couple ?? null,
+                    pigeon_id: body.pigeon_id ?? null,
+                    couple_id: body.couple_id ?? null,
                 },
             }),
             invalidatesTags: [
