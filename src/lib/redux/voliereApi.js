@@ -1,14 +1,13 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 function resolveApiBaseUrl() {
-  let raw = import.meta.env.VITE_API_URL?.trim?.() ?? "";
-  if (!raw) raw = "https://backend-pigeons.onrender.com";
-  raw = raw.replace(/\/+$/, "");
-  if (raw.startsWith("http://") && raw.includes("onrender.com")) {
-    raw = `https://${raw.slice("http://".length)}`;
+  const raw = import.meta.env.VITE_API_URL?.trim?.();
+
+  if (!raw) {
+    throw new Error("VITE_API_URL is missing");
   }
-  if (raw.endsWith("/api")) raw = raw.slice(0, -4).replace(/\/+$/, "");
-  return `${raw}/api`;
+
+  return raw.replace(/\/+$/, "");
 }
 
 const baseUrl = resolveApiBaseUrl();
