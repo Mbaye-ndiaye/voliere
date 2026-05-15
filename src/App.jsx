@@ -20,7 +20,7 @@ export default function App() {
           <Route path="/" element={<IndexRedirect />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/app" element={<AppLayout />}>
-            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route index element={<Navigate to="/app/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="cages" element={<CagesPage />} />
             <Route path="pigeons" element={<PigeonsPage />} />

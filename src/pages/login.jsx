@@ -19,12 +19,16 @@ function LoginPage() {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const authUser = useAppSelector((s) => s.auth.email);
     const [login, { isLoading }] = useLoginMutation();
+    const accessToken = useAppSelector(
+  (s) => s.auth.accessToken
+    );
+
     useEffect(() => {
-        if (authUser)
-            navigate("/app/dashboard");
-    }, [authUser, navigate]);
+    if (accessToken) {
+        navigate("/app/dashboard");
+    }
+    }, [accessToken, navigate]);
     const onSubmit = async (e) => {
         e.preventDefault();
         setError("");

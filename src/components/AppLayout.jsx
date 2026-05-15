@@ -16,14 +16,15 @@ const nav = [
 ];
 
 export function AppLayout() {
-  const username = useAppSelector((s) => s.auth.username);
+  const email = useAppSelector((s) => s.auth.email);
+  const username = email ? email.split("@")[0] : "Utilisateur";
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    if (!username) navigate("/login");
-  }, [username, navigate]);
+    if (!email) navigate("/login");
+  }, [email, navigate]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -31,7 +32,7 @@ export function AppLayout() {
     navigate("/login");
   };
 
-  if (!username) return null;
+  if (!email) return null;
 
   return (
     <div className="min-h-screen flex bg-background">

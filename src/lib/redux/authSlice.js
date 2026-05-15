@@ -29,30 +29,55 @@ function clearLs(keys) {
         /* idem */
     }
 }
+// const initialState = {
+//     accessToken: readLs("access_token"),
+//     refreshToken: readLs("refresh_token"),
+//     username: readLs("username"),
+// };
+// const authSlice = createSlice({
+//     name: "auth",
+//     initialState,
+//     reducers: {
+//         setCredentials(state, action) {
+//             state.accessToken = action.payload.access;
+//             state.refreshToken = action.payload.refresh;
+//             state.username = action.payload.username;
+//             writeLs("access_token", action.payload.access);
+//             writeLs("refresh_token", action.payload.refresh);
+//             writeLs("username", action.payload.username);
+//         },
+//         logout(state) {
+//             state.accessToken = null;
+//             state.refreshToken = null;
+//             state.username = null;
+//             clearLs(["access_token", "refresh_token", "username"]);
+//         },
+//     },
+// });
+
+
 const initialState = {
-    accessToken: readLs("access_token"),
-    refreshToken: readLs("refresh_token"),
-    username: readLs("username"),
+  accessToken: null,
+  refreshToken: null,
+  email: null,
 };
+
 const authSlice = createSlice({
-    name: "auth",
-    initialState,
-    reducers: {
-        setCredentials(state, action) {
-            state.accessToken = action.payload.access;
-            state.refreshToken = action.payload.refresh;
-            state.username = action.payload.username;
-            writeLs("access_token", action.payload.access);
-            writeLs("refresh_token", action.payload.refresh);
-            writeLs("username", action.payload.username);
-        },
-        logout(state) {
-            state.accessToken = null;
-            state.refreshToken = null;
-            state.username = null;
-            clearLs(["access_token", "refresh_token", "username"]);
-        },
+  name: "auth",
+  initialState,
+  reducers: {
+    setCredentials: (state, action) => {
+      state.accessToken = action.payload.access;
+      state.refreshToken = action.payload.refresh;
+      state.email = action.payload.email;
     },
+    logout: (state) => {
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.email = null;
+    }
+  }
 });
+
 export const { setCredentials, logout } = authSlice.actions;
 export default authSlice.reducer;

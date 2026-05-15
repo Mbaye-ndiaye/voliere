@@ -29,10 +29,7 @@ function Dashboard() {
         return _jsx("div", { className: "p-6 text-muted-foreground", children: "Chargement du tableau de bord\u2026" });
     }
     if (errStats || !stats) {
-        const apiBase = typeof import.meta.env.VITE_API_URL === "string" && import.meta.env.VITE_API_URL
-            ? import.meta.env.VITE_API_URL.replace(/\/$/, "")
-            : "https://backend-pigeons.onrender.com";
-        return (_jsxs("div", { className: "p-6 space-y-3 rounded-xl border border-destructive/30 bg-destructive/5", children: [_jsx("p", { className: "text-destructive font-medium", children: "Impossible de charger les statistiques." }), _jsxs("ul", { className: "text-sm text-muted-foreground list-disc pl-5 space-y-1", children: [_jsxs("li", { children: ["V\u00E9rifiez que Django tourne et que ", _jsx("code", { className: "bg-muted px-1 rounded", children: "VITE_API_URL" }), " pointe vers la m\u00EAme origine que dans le navigateur (ex. ", _jsx("code", { className: "bg-muted px-1 rounded", children: apiBase }), ")."] }), _jsxs("li", { children: ["Les stats sont servies sur", " ", _jsx("code", { className: "bg-muted px-1 rounded", children: "GET /api/dashboard/stats/" }), " ou", " ", _jsx("code", { className: "bg-muted px-1 rounded", children: "GET /api/stats/" }), ". En 401, d\u00E9connectez-vous puis reconnectez-vous."] })] }), errStats != null && (_jsxs("p", { className: "text-xs font-mono text-muted-foreground break-all", children: ["D\u00E9tail : ", describeRtkError(errStats)] })), _jsx(Button, { type: "button", variant: "outline", size: "sm", onClick: () => refetch(), disabled: isFetching, children: isFetching ? "Nouvel essai…" : "Réessayer" })] }));
+        const apiBase = import.meta.env.VITE_API_URL;
     }
     const dashboardStats = [
         {
