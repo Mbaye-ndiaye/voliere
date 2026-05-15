@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, } from "@/components/ui/dialog";
 import { DoorOpen, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
+import {toast} from "sonner";
 const typeColor = {
     vente: "bg-cage-couple/30 text-cage-couple-foreground",
     deces: "bg-muted text-muted-foreground",
@@ -57,9 +57,11 @@ function SortieForm({ onClose }) {
                 patch: { status: pigeonStatusFromSortieType(type) },
             }).unwrap();
             onClose();
+            toast.success("Sortie enregistrée avec succès");
         }
         catch {
             /* erreur API */
+            toast.error("Erreur lors de l'enregistrement de la sortie");    
         }
     };
     const busy = loadingSortie || loadingPatch;
