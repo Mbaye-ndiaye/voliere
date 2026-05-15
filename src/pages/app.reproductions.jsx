@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 function ReproductionsPage() {
   const { data: reproductions = [], isLoading } = useGetReproductionsQuery();
@@ -330,15 +331,21 @@ function ReproForm({ onClose }) {
     e.preventDefault();
     if (!coupleId) return;
 
-    await createReproduction({
-      couple: parseInt(coupleId, 10),
-      pond_date: pondDate,
-      hatch_date: hatchDate || null,
-      count,
-      baby_ids: [],
-    }).unwrap();
+    try {
+      await createReproduction({
+        couple: parseInt(coupleId, 10),
+        pond_date: pondDate,
+        hatch_date: hatchDate || null,
+        count,
+        baby_ids: [],
+      }).unwrap();
 
-    onClose();
+      onClose();
+      toast.success("Reproduction enregistrée avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la création de la reproduction:", error);
+      toast.error("Erreur lors de l'enregistrement de la reproduction");
+    }
   };
 
   return (

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { useGetCagesQuery, useGetPigeonsQuery, useGetCouplesQuery, useAddCageMutation, useUpdateCageMutation } from "@/lib/redux/voliereApi";
+import { toast } from "sonner";
 
 function cageDisplayId(code) {
   return code;
@@ -105,9 +106,10 @@ export default function CagesPage() {
       setNewCageCouple("");
       setShowAddModal(false);
       await refetch();
+      toast.success("Cage ajoutée avec succès");
     } catch (error) {
       console.error("Erreur lors de l'ajout de la cage:", error);
-      alert("Erreur lors de l'ajout de la cage. Vérifiez que le code est unique.");
+      toast.error("Erreur lors de l'ajout de la cage. Vérifiez que le code est unique.");
     }
   };
 
@@ -121,10 +123,10 @@ export default function CagesPage() {
         }
       }).unwrap();
       await refetch();
-      alert("Pigeon affecté avec succès !");
+      toast.success("Pigeon affecté avec succès");
     } catch (error) {
       console.error("Erreur lors de l'affectation:", error);
-      alert("Erreur lors de l'affectation du pigeon");
+      toast.error("Erreur lors de l'affectation du pigeon");
     }
   };
 
@@ -138,10 +140,10 @@ export default function CagesPage() {
         }
       }).unwrap();
       await refetch();
-      alert("Couple affecté avec succès !");
+      toast.success("Couple affecté avec succès");
     } catch (error) {
       console.error("Erreur lors de l'affectation:", error);
-      alert("Erreur lors de l'affectation du couple");
+      toast.error("Erreur lors de l'affectation du couple");
     }
   };
 
@@ -159,10 +161,10 @@ export default function CagesPage() {
       // Ajouter un événement dans l'historique si l'API le permet
       // await createHistoryEvent({ cageId, kind: "liberer" });
       
-      alert("Cage libérée avec succès !");
+      toast.success("Cage libérée avec succès");
     } catch (error) {
       console.error("Erreur lors de la libération:", error);
-      alert("Erreur lors de la libération de la cage");
+      toast.error("Erreur lors de la libération de la cage");
     }
   };
 
