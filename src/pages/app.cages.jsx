@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState } from "react";
 import {
   Bird,
@@ -50,85 +49,37 @@ export default function CagesPage() {
   const { data: pigeons = [] } = useGetPigeonsQuery();
   const { data: couples = [] } = useGetCouplesQuery();
   
-
-  // EXEMPLE DATA
-  // const cages = [
-  //   {
-  //     id: 1,
-  //     code: "A01",
-  //     pigeon: {
-  //       id: 1,
-  //       bague: "SN-100",
-  //       sex: "M",
-  //       race: "Mondain",
-  //       birth_date: "2023-05-12",
-  //     },
-  //   },
-  //   {
-  //     id: 2,
-  //     code: "A02",
-  //     couple: {
-  //       male: {
-  //         bague: "SN-200",
-  //       },
-  //       female: {
-  //         bague: "SN-201",
-  //       },
-  //     },
-  //   },
-  //   {
-  //     id: 3,
-  //     code: "A03",
-  //   },
-  //   {
-  //     id: 4,
-  //     code: "A04",
-  //     pigeon: {
-  //       id: 2,
-  //       bague: "SN-300",
-  //       sex: "F",
-  //       race: "King",
-  //       birth_date: "2022-08-10",
-  //     },
-  //   },
-  // ];
-const cagesFormatted = useMemo(() => {
-  return cages.map((cage) => ({
-    ...cage,
-
-    pigeon: cage.pigeon,
-
-    couple: cage.couple
-      ? {
-          ...cage.couple,
-
-          male: cage.couple.male,
-          female: cage.couple.female,
-        }
-      : null,
-  }));
-}, [cages]);
-const sortedCages = useMemo(() => {
-  return [...cages].sort((a, b) =>
-    a.code.localeCompare(b.code, undefined, {
-      numeric: true,
-    })
-  );
-}, [cages]);
+  const cagesFormatted = useMemo(() => {
+    return cages.map((cage) => ({
+      ...cage,
+      pigeon: cage.pigeon,
+      couple: cage.couple
+        ? {
+            ...cage.couple,
+            male: cage.couple.male,
+            female: cage.couple.female,
+          }
+        : null,
+    }));
+  }, [cages]);
+  
+  const sortedCages = useMemo(() => {
+    return [...cages].sort((a, b) =>
+      a.code.localeCompare(b.code, undefined, {
+        numeric: true,
+      })
+    );
+  }, [cages]);
 
   const filteredCages = useMemo(() => {
-  if (filter === "all") return sortedCages;
-  return sortedCages.filter((c) => cageState(c) === filter);
-}, [sortedCages, filter]);
+    if (filter === "all") return sortedCages;
+    return sortedCages.filter((c) => cageState(c) === filter);
+  }, [sortedCages, filter]);
 
   const selected =
     selectedId != null
       ? cages.find((c) => c.id === selectedId)
       : null;
-  //     const selected =
-  // selectedId != null
-  //   ? cages.find((c) => c.id === selectedId)
-  //   : null;
 
   return (
     <div className="min-h-screen bg-gray-100 p-5">
@@ -165,7 +116,6 @@ const sortedCages = useMemo(() => {
 
         {/* ACTIONS */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* FILTER */}
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
@@ -177,7 +127,6 @@ const sortedCages = useMemo(() => {
             <option value="couple">Couples</option>
           </select>
 
-          {/* VIEW MODE */}
           <div className="flex overflow-hidden rounded-lg border bg-white">
             <button
               onClick={() => setViewMode("grid")}
@@ -208,7 +157,6 @@ const sortedCages = useMemo(() => {
       {viewMode === "grid" ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
           {filteredCages.map((cage) => (
-            console.log("cage", cage),
             <CageTile
               key={cage.id}
               cage={cage}
@@ -272,7 +220,7 @@ const sortedCages = useMemo(() => {
 
                       {st === "couple" && (
                         <span className="rounded bg-orange-100 px-2 py-1 text-sm text-orange-700">
-                          Couple()
+                          Couple
                         </span>
                       )}
                     </td>
@@ -295,93 +243,122 @@ const sortedCages = useMemo(() => {
       )}
 
       {/* DETAIL PANEL */}
-      {/* DETAIL PANEL À DROITE */}
-  <div
-    className={`fixed right-0 top-0 z-50 h-screen w-full max-w-md transform bg-white shadow-2xl transition-transform duration-300 ${
-      selected ? "translate-x-0" : "translate-x-full"
-    }`}
-  >
-  {selected && (
-    <div className="flex h-full flex-col">
-      {/* HEADER */}
-      <div className="flex items-center justify-between border-b p-5">
-        <div>
-          <h2 className="text-2xl font-bold">
-            Cage {selected.code}
-          </h2>
+      <div
+        className={`fixed right-0 top-0 z-50 h-screen w-full max-w-md transform bg-white shadow-2xl transition-transform duration-300 ${
+          selected ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {selected && (
+          <div className="flex h-full flex-col">
+            <div className="flex items-center justify-between border-b p-5">
+              <div>
+                <h2 className="text-2xl font-bold">
+                  Cage {selected.code}
+                </h2>
 
-          {cageState(selected) === "libre" && (
-            <span className="mt-2 inline-block rounded bg-green-100 px-3 py-1 text-sm text-green-700">
-              Libre
-            </span>
-          )}
+                {cageState(selected) === "libre" && (
+                  <span className="mt-2 inline-block rounded bg-green-100 px-3 py-1 text-sm text-green-700">
+                    Libre
+                  </span>
+                )}
 
-          {cageState(selected) === "pigeon" && (
-            <span className="mt-2 inline-block rounded bg-red-100 px-3 py-1 text-sm text-red-700">
-              1 pigeon
-            </span>
-          )}
+                {cageState(selected) === "pigeon" && (
+                  <span className="mt-2 inline-block rounded bg-red-100 px-3 py-1 text-sm text-red-700">
+                    1 pigeon
+                  </span>
+                )}
 
-          {cageState(selected) === "couple" && (
-            <span className="mt-2 inline-block rounded bg-orange-100 px-3 py-1 text-sm text-orange-700">
-              Couple
-            </span>
-          )}
-        </div>
+                {cageState(selected) === "couple" && (
+                  <span className="mt-2 inline-block rounded bg-orange-100 px-3 py-1 text-sm text-orange-700">
+                    Couple
+                  </span>
+                )}
+              </div>
 
-        {/* CLOSE BUTTON */}
-        <button
+              <button
+                onClick={() => setSelectedId(null)}
+                className="rounded-lg bg-gray-100 px-3 py-2 text-sm hover:bg-gray-200"
+              >
+                Fermer
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-5">
+              {selected.pigeon && (
+                <PigeonMiniCard pigeon={selected.pigeon} />
+              )}
+
+              {selected.couple && (
+                <div className="space-y-3">
+                  <PigeonMiniCard
+                    pigeon={{
+                      ...selected.couple.male,
+                      sex: "M",
+                    }}
+                  />
+
+                  <PigeonMiniCard
+                    pigeon={{
+                      ...selected.couple.female,
+                      sex: "F",
+                    }}
+                  />
+                </div>
+              )}
+
+              {cageState(selected) === "libre" && (
+                <div className="rounded-2xl border border-dashed p-10 text-center text-gray-500">
+                  Cage vide
+                </div>
+              )}
+
+              {/* Section Historique - comme dans l'image */}
+              <div className="mt-6 border-t pt-4">
+                <h3 className="mb-3 font-semibold text-gray-700">Historique</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-gray-600">12/03/2026</span>
+                    <span className="text-gray-800">Couple affecté</span>
+                  </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-gray-600">05/02/2026</span>
+                    <span className="text-gray-800">Cage nettoyée</span>
+                  </div>
+                  <button className="mt-2 text-sm text-sky-600 hover:underline">
+                    Voir tout l'historique
+                  </button>
+                </div>
+              </div>
+
+              {/* Section Actions - comme dans l'image */}
+              <div className="mt-6 border-t pt-4">
+                <h3 className="mb-3 font-semibold text-gray-700">Actions</h3>
+                <div className="flex flex-col gap-2">
+                  <button className="rounded-lg bg-sky-500 px-4 py-2 text-left text-sm text-white hover:bg-sky-600">
+                    Affecter un pigeon
+                  </button>
+                  <button className="rounded-lg bg-orange-500 px-4 py-2 text-left text-sm text-white hover:bg-orange-600">
+                    Affecter un couple
+                  </button>
+                  <button className="rounded-lg bg-gray-500 px-4 py-2 text-left text-sm text-white hover:bg-gray-600">
+                    Libérer la cage
+                  </button>
+                  <button className="rounded-lg border border-gray-300 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50">
+                    Voir historique complet
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {selected && (
+        <div
           onClick={() => setSelectedId(null)}
-          className="rounded-lg bg-gray-100 px-3 py-2 text-sm hover:bg-gray-200"
-        >
-          Fermer
-        </button>
-      </div>
-
-      {/* CONTENT */}
-      <div className="flex-1 overflow-y-auto p-5">
-        {/* PIGEON */}
-        {selected.pigeon && (
-          <PigeonMiniCard pigeon={selected.pigeon} />
-        )}
-
-        {/* COUPLE */}
-        {selected.couple && (
-          <div className="space-y-3">
-            <PigeonMiniCard
-              pigeon={{
-                ...selected.couple.male,
-                sex: "M",
-              }}
-            />
-
-            <PigeonMiniCard
-              pigeon={{
-                ...selected.couple.female,
-                sex: "F",
-              }}
-            />
-          </div>
-        )}
-
-        {/* LIBRE */}
-        {cageState(selected) === "libre" && (
-          <div className="rounded-2xl border border-dashed p-10 text-center text-gray-500">
-            Cage vide
-          </div>
-        )}
-      </div>
-    </div>
-  )}
-</div>
-
-{/* OVERLAY */}
-{selected && (
-  <div
-    onClick={() => setSelectedId(null)}
-    className="fixed inset-0 z-40 bg-black/40"
-  />
-)}
+          className="fixed inset-0 z-40 bg-black/40"
+        />
+      )}
     </div>
   );
 }
@@ -414,7 +391,6 @@ function CageTile({
           {cageDisplayId(cage.code)}
         </span>
 
-        {/* ICON */}
         {st === "libre" && (
           <Bird className="h-10 w-10" />
         )}
@@ -430,7 +406,6 @@ function CageTile({
           </div>
         )}
 
-        {/* LABEL */}
         <span className="text-center text-xs">
           {st === "libre" && "Libre"}
 

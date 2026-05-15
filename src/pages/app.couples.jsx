@@ -27,25 +27,35 @@ function CouplesPage() {
     if (isLoading) {
         return _jsx("div", { className: "text-muted-foreground", children: "Chargement des couples\u2026" });
     }
-    return (_jsxs("div", { className: "space-y-6", children: [_jsxs("header", { className: "flex items-end justify-between gap-4 flex-wrap", children: [_jsxs("div", { children: [_jsx("h1", { className: "font-display text-4xl font-bold", children: "Couples" }), _jsxs("p", { className: "text-muted-foreground mt-1", children: [activeCouples.length, " couple", activeCouples.length > 1 ? "s" : "", " actif", activeCouples.length > 1 ? "s" : ""] })] }), _jsxs(Dialog, { open: open, onOpenChange: setOpen, children: [_jsx(DialogTrigger, { asChild: true, children: _jsxs(Button, { children: [_jsx(Plus, { className: "w-4 h-4" }), " Nouveau couple"] }) }), _jsx(CoupleForm, { onClose: () => setOpen(false) })] })] }), _jsxs("div", { className: "grid sm:grid-cols-2 gap-4", children: [activeCouples.map((c) => {
-                        const m = pigeons.find((p) => p.id === c.male);
-                        const f = pigeons.find((p) => p.id === c.female);
-                        return (_jsx(CoupleCard, { couple: c, maleBague: m?.bague ?? "—", femaleBague: f?.bague ?? "—", onOpen: () => setDetailId(c.id), onDissolve: () => dissolve(c.id) }, c.id));
-                    }), activeCouples.length === 0 && (_jsx("p", { className: "text-muted-foreground col-span-full text-center py-12", children: "Aucun couple." }))] }), _jsx(CoupleDetailSheet, { open: detailId != null, onOpenChange: (o) => {
-                    if (!o)
-                        setDetailId(null);
-                }, couple: detailCouple, pigeons: pigeons, reproductions: reproductions })] }));
+    return (_jsxs("div", {
+        className: "space-y-6", children: [_jsxs("header", { className: "flex items-end justify-between gap-4 flex-wrap", children: [_jsxs("div", { children: [_jsx("h1", { className: "font-display text-4xl font-bold", children: "Couples" }), _jsxs("p", { className: "text-muted-foreground mt-1", children: [activeCouples.length, " couple", activeCouples.length > 1 ? "s" : "", " actif", activeCouples.length > 1 ? "s" : ""] })] }), _jsxs(Dialog, { open: open, onOpenChange: setOpen, children: [_jsx(DialogTrigger, { asChild: true, children: _jsxs(Button, { children: [_jsx(Plus, { className: "w-4 h-4" }), " Nouveau couple"] }) }), _jsx(CoupleForm, { onClose: () => setOpen(false) })] })] }), _jsxs("div", {
+            className: "grid sm:grid-cols-2 gap-4", children: [activeCouples.map((c) => {
+                const m = pigeons.find((p) => p.id === c.male);
+                const f = pigeons.find((p) => p.id === c.female);
+                return (_jsx(CoupleCard, { couple: c, maleBague: m?.bague ?? "—", femaleBague: f?.bague ?? "—", onOpen: () => setDetailId(c.id), onDissolve: () => dissolve(c.id) }, c.id));
+            }), activeCouples.length === 0 && (_jsx("p", { className: "text-muted-foreground col-span-full text-center py-12", children: "Aucun couple." }))]
+        }), _jsx(CoupleDetailSheet, {
+            open: detailId != null, onOpenChange: (o) => {
+                if (!o)
+                    setDetailId(null);
+            }, couple: detailCouple, pigeons: pigeons, reproductions: reproductions
+        })]
+    }));
 }
 function CoupleCard({ couple, maleBague, femaleBague, onOpen, onDissolve, }) {
-    return (_jsxs("div", { role: "button", tabIndex: 0, onClick: onOpen, onKeyDown: (e) => {
+    return (_jsxs("div", {
+        role: "button", tabIndex: 0, onClick: onOpen, onKeyDown: (e) => {
             if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 onOpen();
             }
-        }, className: "bg-card rounded-2xl p-5 border border-border cursor-pointer transition hover:border-primary/40 hover:ring-1 hover:ring-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary", style: { boxShadow: "var(--shadow-soft)" }, children: [_jsxs("div", { className: "flex items-start justify-between", children: [_jsxs("div", { className: "flex items-center gap-3", children: [_jsx("div", { className: "w-10 h-10 rounded-xl bg-cage-couple/30 text-cage-couple-foreground flex items-center justify-center", children: _jsx(Heart, { className: "w-5 h-5" }) }), _jsxs("div", { children: [_jsxs("div", { className: "font-display text-lg font-bold", children: ["#", couple.id] }), _jsxs("div", { className: "text-xs text-muted-foreground", children: ["Form\u00E9 le ", new Date(couple.formed_at).toLocaleDateString("fr-FR")] })] })] }), _jsx(Badge, { variant: couple.active ? "default" : "outline", children: couple.active ? "actif" : "dissous" })] }), _jsxs("div", { className: "mt-4 flex items-center justify-between p-3 rounded-xl bg-muted", children: [_jsxs("div", { className: "text-center flex-1", children: [_jsx("div", { className: "text-xs text-muted-foreground", children: "\u2642 M\u00E2le" }), _jsx("div", { className: "font-bold", children: maleBague })] }), _jsx(Heart, { className: "w-4 h-4 text-primary" }), _jsxs("div", { className: "text-center flex-1", children: [_jsx("div", { className: "text-xs text-muted-foreground", children: "\u2640 Femelle" }), _jsx("div", { className: "font-bold", children: femaleBague })] })] }), couple.active && (_jsx(Button, { variant: "ghost", size: "sm", className: "w-full mt-3 text-destructive hover:bg-destructive/10", type: "button", onClick: (e) => {
-                    e.stopPropagation();
-                    onDissolve();
-                }, children: "Dissoudre le couple" }))] }));
+        }, className: "bg-card rounded-2xl p-5 border border-border cursor-pointer transition hover:border-primary/40 hover:ring-1 hover:ring-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary", style: { boxShadow: "var(--shadow-soft)" }, children: [_jsxs("div", { className: "flex items-start justify-between", children: [_jsxs("div", { className: "flex items-center gap-3", children: [_jsx("div", { className: "w-10 h-10 rounded-xl bg-cage-couple/30 text-cage-couple-foreground flex items-center justify-center", children: _jsx(Heart, { className: "w-5 h-5" }) }), _jsxs("div", { children: [_jsxs("div", { className: "font-display text-lg font-bold", children: ["#", couple.id] }), _jsxs("div", { className: "text-xs text-muted-foreground", children: ["Form\u00E9 le ", new Date(couple.formed_at).toLocaleDateString("fr-FR")] })] })] }), _jsx(Badge, { variant: couple.active ? "default" : "outline", children: couple.active ? "actif" : "dissous" })] }), _jsxs("div", { className: "mt-4 flex items-center justify-between p-3 rounded-xl bg-muted", children: [_jsxs("div", { className: "text-center flex-1", children: [_jsx("div", { className: "text-xs text-muted-foreground", children: "\u2642 M\u00E2le" }), _jsx("div", { className: "font-bold", children: maleBague })] }), _jsx(Heart, { className: "w-4 h-4 text-primary" }), _jsxs("div", { className: "text-center flex-1", children: [_jsx("div", { className: "text-xs text-muted-foreground", children: "\u2640 Femelle" }), _jsx("div", { className: "font-bold", children: femaleBague })] })] }), couple.active && (_jsx(Button, {
+            variant: "ghost", size: "sm", className: "w-full mt-3 text-destructive hover:bg-destructive/10", type: "button", onClick: (e) => {
+                e.stopPropagation();
+                onDissolve();
+            }, children: "Dissoudre le couple"
+        }))]
+    }));
 }
 function CoupleDetailSheet({ open, onOpenChange, couple, pigeons, reproductions, }) {
     const [historyOpen, setHistoryOpen] = useState(false);

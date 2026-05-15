@@ -1,13 +1,13 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 function resolveApiBaseUrl() {
-  const raw = import.meta.env.VITE_API_URL?.trim();
+    const raw = import.meta.env.VITE_API_URL?.trim();
 
-  if (!raw) {
-    throw new Error("VITE_API_URL is missing");
-  }
+    if (!raw) {
+        throw new Error("VITE_API_URL is missing");
+    }
 
-  return raw.replace(/\/+$/, "");
+    return raw.replace(/\/+$/, "");
 }
 
 const baseUrl = `${resolveApiBaseUrl()}/api`;
@@ -198,20 +198,20 @@ export const voliereApi = createApi({
                 { type: "Stats", id: "STATS" },
             ],
         }),
-         addCage: builder.mutation({
-        query: (body) => ({
-            url: "/cages/",
-            method: "POST",
-            body: {
-            code: body.code,
-            pigeon: body.pigeon ?? null,
-            couple: body.couple ?? null,
-            },
-        }),
-        invalidatesTags: [
-            { type: "Cage", id: "LIST" },
-            { type: "Stats", id: "STATS" },
-        ],
+        addCage: builder.mutation({
+            query: (body) => ({
+                url: "/cages/",
+                method: "POST",
+                body: {
+                    code: body.code,
+                    pigeon: body.pigeon ?? null,
+                    couple: body.couple ?? null,
+                },
+            }),
+            invalidatesTags: [
+                { type: "Cage", id: "LIST" },
+                { type: "Stats", id: "STATS" },
+            ],
         }),
         getCages: builder.query({
             query: () => "/cages/",
@@ -251,8 +251,8 @@ export const voliereApi = createApi({
         }),
     }),
 
-   
+
 });
 
 
-export const { useLoginMutation, useGetStatsQuery, useGetPigeonsQuery, useCreatePigeonMutation, useUpdatePigeonMutation, useGetCouplesQuery, useCreateCoupleMutation, useUpdateCoupleMutation, useGetReproductionsQuery, useCreateReproductionMutation, useGetSortiesQuery, useCreateSortieMutation, useGetCagesQuery, useGetCageHistoryQuery, useCreateCageHistoryEventMutation, useUpdateCageMutation,useAddCageMutation, } = voliereApi;
+export const { useLoginMutation, useGetStatsQuery, useGetPigeonsQuery, useCreatePigeonMutation, useUpdatePigeonMutation, useGetCouplesQuery, useCreateCoupleMutation, useUpdateCoupleMutation, useGetReproductionsQuery, useCreateReproductionMutation, useGetSortiesQuery, useCreateSortieMutation, useGetCagesQuery, useGetCageHistoryQuery, useCreateCageHistoryEventMutation, useUpdateCageMutation, useAddCageMutation, } = voliereApi;
