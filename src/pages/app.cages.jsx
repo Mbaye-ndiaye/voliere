@@ -790,11 +790,11 @@ export default function CagesPage() {
 
       {/* DETAIL PANEL */}
       {/* DETAIL PANEL À DROITE */}
-<div
-  className={`fixed right-0 top-0 z-50 h-screen w-full max-w-md transform bg-white shadow-2xl transition-transform duration-300 ${
-    selected ? "translate-x-0" : "translate-x-full"
-  }`}
->
+  <div
+    className={`fixed right-0 top-0 z-50 h-screen w-full max-w-md transform bg-white shadow-2xl transition-transform duration-300 ${
+      selected ? "translate-x-0" : "translate-x-full"
+    }`}
+  >
   {selected && (
     <div className="flex h-full flex-col">
       {/* HEADER */}
