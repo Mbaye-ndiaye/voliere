@@ -5,11 +5,12 @@ import {
   Home,
   LayoutGrid,
   List,
+  Plus,
   User,
   Users,
 } from "lucide-react";
 
-import { useGetCagesQuery, useGetPigeonsQuery, useGetCouplesQuery } from "@/lib/redux/voliereApi";
+import { useGetCagesQuery, useGetPigeonsQuery, useGetCouplesQuery, useAddCageMutation, useUpdateCageMutation } from "@/lib/redux/voliereApi";
 
 function cageDisplayId(code) {
   return code;
@@ -45,9 +46,15 @@ export default function CagesPage() {
   const [selectedId, setSelectedId] = useState(null);
   const [viewMode, setViewMode] = useState("grid");
   const [filter, setFilter] = useState("all");
-  const { data: cages = [], isLoading } = useGetCagesQuery();
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newCageCode, setNewCageCode] = useState("");
+  const [newCagePigeon, setNewCagePigeon] = useState("");
+  const [newCageCouple, setNewCageCouple] = useState("");
+  const { data: cages = [], isLoading, refetch } = useGetCagesQuery();
   const { data: pigeons = [] } = useGetPigeonsQuery();
   const { data: couples = [] } = useGetCouplesQuery();
+  const [addCage, { isLoading: isCreating }] = useAddCageMutation();
+  const [updateCage] = useUpdateCageMutation();
   
   const cagesFormatted = useMemo(() => {
     return cages.map((cage) => ({
@@ -64,12 +71,12 @@ export default function CagesPage() {
   }, [cages]);
   
   const sortedCages = useMemo(() => {
-    return [...cages].sort((a, b) =>
+    return [...cagesFormatted].sort((a, b) =>
       a.code.localeCompare(b.code, undefined, {
         numeric: true,
       })
     );
-  }, [cages]);
+  }, [cagesFormatted]);
 
   const filteredCages = useMemo(() => {
     if (filter === "all") return sortedCages;
@@ -77,9 +84,126 @@ export default function CagesPage() {
   }, [sortedCages, filter]);
 
   const selected =
-    selectedId != null
-      ? cages.find((c) => c.id === selectedId)
-      : null;
+  selectedId != null
+    ? cagesFormatted.find((c) => c.id === selectedId)
+    : null;
+
+  const handleAddCage = async () => {
+    if (!newCageCode) return;
+    
+    try {
+      // Appel API pour créer la cage
+      await addCage({
+        code: newCageCode,
+        pigeon: newCagePigeon ? parseInt(newCagePigeon, 10) : null,
+        couple: newCageCouple ? parseInt(newCageCouple, 10) : null,
+      }).unwrap();
+      
+      // Réinitialiser le formulaire
+      setNewCageCode("");
+      setNewCagePigeon("");
+      setNewCageCouple("");
+      setShowAddModal(false);
+      await refetch();
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de la cage:", error);
+      alert("Erreur lors de l'ajout de la cage. Vérifiez que le code est unique.");
+    }
+  };
+
+  const handleAssignPigeon = async (cageId, pigeonId) => {
+    try {
+      await updateCage({
+        id: cageId,
+        patch: { 
+          pigeon: pigeonId,
+          couple: null // On enlève le couple si présent
+        }
+      }).unwrap();
+      await refetch();
+      alert("Pigeon affecté avec succès !");
+    } catch (error) {
+      console.error("Erreur lors de l'affectation:", error);
+      alert("Erreur lors de l'affectation du pigeon");
+    }
+  };
+
+  const handleAssignCouple = async (cageId, coupleId) => {
+    try {
+      await updateCage({
+        id: cageId,
+        patch: { 
+          couple: coupleId,
+          pigeon: null // On enlève le pigeon si présent
+        }
+      }).unwrap();
+      await refetch();
+      alert("Couple affecté avec succès !");
+    } catch (error) {
+      console.error("Erreur lors de l'affectation:", error);
+      alert("Erreur lors de l'affectation du couple");
+    }
+  };
+
+  const handleLibererCage = async (cageId) => {
+    try {
+      await updateCage({
+        id: cageId,
+        patch: { 
+          pigeon: null,
+          couple: null
+        }
+      }).unwrap();
+      await refetch();
+      
+      // Ajouter un événement dans l'historique si l'API le permet
+      // await createHistoryEvent({ cageId, kind: "liberer" });
+      
+      alert("Cage libérée avec succès !");
+    } catch (error) {
+      console.error("Erreur lors de la libération:", error);
+      alert("Erreur lors de la libération de la cage");
+    }
+  };
+
+  // Pigeons disponibles (sans cage)
+  const availablePigeons = pigeons.filter(
+    p => !cagesFormatted.some(c => c.pigeon?.id === p.id)
+  );
+  
+  // Couples disponibles (sans cage)
+  const availableCouples = couples.filter(
+  c => !cagesFormatted.some(cage => cage.couple?.id === c.id)
+);
+  // États pour les modales d'affectation
+  const [showAssignPigeonModal, setShowAssignPigeonModal] = useState(false);
+  const [showAssignCoupleModal, setShowAssignCoupleModal] = useState(false);
+  const [selectedPigeonId, setSelectedPigeonId] = useState("");
+  const [selectedCoupleId, setSelectedCoupleId] = useState("");
+
+  const handleOpenAssignPigeon = () => {
+    setSelectedPigeonId("");
+    setShowAssignPigeonModal(true);
+  };
+
+  const handleOpenAssignCouple = () => {
+    setSelectedCoupleId("");
+    setShowAssignCoupleModal(true);
+  };
+
+  const confirmAssignPigeon = async () => {
+    if (selectedId && selectedPigeonId) {
+      await handleAssignPigeon(selectedId, selectedPigeonId);
+      setShowAssignPigeonModal(false);
+    }
+  };
+
+  const confirmAssignCouple = async () => {
+    if (selectedId && selectedCoupleId) {
+      await handleAssignCouple(selectedId, selectedCoupleId);
+      setShowAssignCoupleModal(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-5">
@@ -126,6 +250,15 @@ export default function CagesPage() {
             <option value="pigeon">1 pigeon</option>
             <option value="couple">Couples</option>
           </select>
+
+          {/* Bouton avec le même style que "Nouveau pigeon" */}
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Plus className="h-4 w-4" />
+            Ajouter une cage
+          </button>
 
           <div className="flex overflow-hidden rounded-lg border bg-white">
             <button
@@ -312,17 +445,12 @@ export default function CagesPage() {
                 </div>
               )}
 
-              {/* Section Historique - comme dans l'image */}
               <div className="mt-6 border-t pt-4">
                 <h3 className="mb-3 font-semibold text-gray-700">Historique</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between border-b pb-2">
-                    <span className="text-gray-600">12/03/2026</span>
-                    <span className="text-gray-800">Couple affecté</span>
-                  </div>
-                  <div className="flex justify-between border-b pb-2">
-                    <span className="text-gray-600">05/02/2026</span>
-                    <span className="text-gray-800">Cage nettoyée</span>
+                    <span className="text-gray-600">{new Date().toLocaleDateString('fr-FR')}</span>
+                    <span className="text-gray-800">Dernière modification</span>
                   </div>
                   <button className="mt-2 text-sm text-sky-600 hover:underline">
                     Voir tout l'historique
@@ -330,17 +458,25 @@ export default function CagesPage() {
                 </div>
               </div>
 
-              {/* Section Actions - comme dans l'image */}
               <div className="mt-6 border-t pt-4">
                 <h3 className="mb-3 font-semibold text-gray-700">Actions</h3>
                 <div className="flex flex-col gap-2">
-                  <button className="rounded-lg bg-sky-500 px-4 py-2 text-left text-sm text-white hover:bg-sky-600">
+                  <button 
+                    onClick={handleOpenAssignPigeon}
+                    className="rounded-lg bg-sky-500 px-4 py-2 text-left text-sm text-white hover:bg-sky-600"
+                  >
                     Affecter un pigeon
                   </button>
-                  <button className="rounded-lg bg-orange-500 px-4 py-2 text-left text-sm text-white hover:bg-orange-600">
+                  <button 
+                    onClick={handleOpenAssignCouple}
+                    className="rounded-lg bg-orange-500 px-4 py-2 text-left text-sm text-white hover:bg-orange-600"
+                  >
                     Affecter un couple
                   </button>
-                  <button className="rounded-lg bg-gray-500 px-4 py-2 text-left text-sm text-white hover:bg-gray-600">
+                  <button 
+                    onClick={() => handleLibererCage(selected.id)}
+                    className="rounded-lg bg-gray-500 px-4 py-2 text-left text-sm text-white hover:bg-gray-600"
+                  >
                     Libérer la cage
                   </button>
                   <button className="rounded-lg border border-gray-300 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50">
@@ -358,6 +494,163 @@ export default function CagesPage() {
           onClick={() => setSelectedId(null)}
           className="fixed inset-0 z-40 bg-black/40"
         />
+      )}
+
+      {/* MODAL AJOUT CAGE */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <h2 className="mb-4 text-2xl font-bold">Ajouter une cage</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium">Code de la cage *</label>
+                <input
+                  type="text"
+                  value={newCageCode}
+                  onChange={(e) => setNewCageCode(e.target.value)}
+                  placeholder="Ex: A16"
+                  className="w-full rounded-lg border px-3 py-2"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium">Pigeon (optionnel)</label>
+                <select
+                  value={newCagePigeon}
+                  onChange={(e) => setNewCagePigeon(e.target.value)}
+                  className="w-full rounded-lg border px-3 py-2"
+                >
+                  <option value="">Aucun pigeon</option>
+                  {availablePigeons.map((pigeon) => (
+                    <option key={pigeon.id} value={pigeon.id}>
+                      {pigeon.bague} - {pigeon.race || "Race inconnue"}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium">Couple (optionnel)</label>
+                <select
+                  value={newCageCouple}
+                  onChange={(e) => setNewCageCouple(e.target.value)}
+                  className="w-full rounded-lg border px-3 py-2"
+                >
+                  <option value="">Aucun couple</option>
+                  {availableCouples.map((couple) => (
+                    <option key={couple.id} value={couple.id}>
+                      Couple #{couple.id}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="rounded-lg border px-4 py-2 hover:bg-gray-50"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleAddCage}
+                  disabled={!newCageCode || isCreating}
+                  className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-50"
+                >
+                  {isCreating ? "Ajout en cours..." : "Ajouter"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL AFFECTER PIGEON */}
+      {showAssignPigeonModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <h2 className="mb-4 text-2xl font-bold">Affecter un pigeon</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium">Sélectionner un pigeon</label>
+                <select
+                  value={selectedPigeonId}
+                  onChange={(e) => setSelectedPigeonId(e.target.value)}
+                  className="w-full rounded-lg border px-3 py-2"
+                >
+                  <option value="">Choisir un pigeon...</option>
+                  {availablePigeons.map((pigeon) => (
+                    <option key={pigeon.id} value={pigeon.id}>
+                      {pigeon.bague} - {pigeon.race || "Race inconnue"}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  onClick={() => setShowAssignPigeonModal(false)}
+                  className="rounded-lg border px-4 py-2 hover:bg-gray-50"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={confirmAssignPigeon}
+                  disabled={!selectedPigeonId}
+                  className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-50"
+                >
+                  Affecter
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL AFFECTER COUPLE */}
+      {showAssignCoupleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <h2 className="mb-4 text-2xl font-bold">Affecter un couple</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium">Sélectionner un couple</label>
+                <select
+                  value={selectedCoupleId}
+                  onChange={(e) => setSelectedCoupleId(e.target.value)}
+                  className="w-full rounded-lg border px-3 py-2"
+                >
+                  <option value="">Choisir un couple...</option>
+                  {availableCouples.map((couple) => (
+                    <option key={couple.id} value={couple.id}>
+                      Couple #{couple.id}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  onClick={() => setShowAssignCoupleModal(false)}
+                  className="rounded-lg border px-4 py-2 hover:bg-gray-50"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={confirmAssignCouple}
+                  disabled={!selectedCoupleId}
+                  className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-50"
+                >
+                  Affecter
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
