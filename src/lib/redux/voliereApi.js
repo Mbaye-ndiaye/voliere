@@ -20,7 +20,14 @@ export const voliereApi = createApi({
     reducerPath: "voliereApi",
     baseQuery: fetchBaseQuery({
         baseUrl,
-        prepareHeaders: (headers, { getState }) => {
+        prepareHeaders: (headers, { getState, endpoint }) => {
+            // Ne pas ajouter de token pour les endpoints publics
+            const publicEndpoints = ['login', 'register'];
+            if (publicEndpoints.includes(endpoint)) {
+                headers.set("Accept", "application/json");
+                return headers;
+            }
+
             let token = null;
             try {
                 const st = getState();
@@ -48,6 +55,13 @@ export const voliereApi = createApi({
         login: builder.mutation({
             query: (body) => ({
                 url: "/auth/login/",
+                method: "POST",
+                body,
+            }),
+        }),
+        register: builder.mutation({
+            query: (body) => ({
+                url: "/auth/register/",
                 method: "POST",
                 body,
             }),
@@ -255,4 +269,4 @@ export const voliereApi = createApi({
 });
 
 
-export const { useLoginMutation, useGetStatsQuery, useGetPigeonsQuery, useCreatePigeonMutation, useUpdatePigeonMutation, useGetCouplesQuery, useCreateCoupleMutation, useUpdateCoupleMutation, useGetReproductionsQuery, useCreateReproductionMutation, useGetSortiesQuery, useCreateSortieMutation, useGetCagesQuery, useGetCageHistoryQuery, useCreateCageHistoryEventMutation, useUpdateCageMutation, useAddCageMutation, } = voliereApi;
+export const { useLoginMutation, useRegisterMutation, useGetStatsQuery, useGetPigeonsQuery, useCreatePigeonMutation, useUpdatePigeonMutation, useGetCouplesQuery, useCreateCoupleMutation, useUpdateCoupleMutation, useGetReproductionsQuery, useCreateReproductionMutation, useGetSortiesQuery, useCreateSortieMutation, useGetCagesQuery, useGetCageHistoryQuery, useCreateCageHistoryEventMutation, useUpdateCageMutation, useAddCageMutation, } = voliereApi;

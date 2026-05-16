@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AppLayout } from "@/components/AppLayout";
 import IndexRedirect from "@/pages/index.jsx";
 import LoginPage from "@/pages/login.jsx";
+import RegisterPage from "@/pages/register.jsx";
 import Dashboard from "@/pages/app.dashboard.jsx";
 import CagesPage from "@/pages/app.cages.jsx";
 import PigeonsPage from "@/pages/app.pigeons.jsx";
@@ -19,6 +20,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<IndexRedirect />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/app" element={<AppLayout />}>
             <Route index element={<Navigate to="/app/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
