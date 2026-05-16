@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Bird } from "lucide-react";
-
 /** RTK Query rejette `unwrap()` avec un objet `{ status, data?, error? }` — pas d’export `isFetchBaseQueryError` dans toutes les versions du toolkit. */
 function isRtkQueryRejected(err) {
     return typeof err === "object" && err !== null && "status" in err;
