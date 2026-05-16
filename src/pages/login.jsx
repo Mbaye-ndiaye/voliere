@@ -22,7 +22,6 @@ function LoginPage() {
     const accessToken = useAppSelector(
   (s) => s.auth.accessToken
     );
-
     useEffect(() => {
     if (accessToken) {
         navigate("/app/dashboard");
