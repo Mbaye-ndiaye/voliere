@@ -12,7 +12,6 @@ import PigeonsPage from "@/pages/app.pigeons.jsx";
 import CouplesPage from "@/pages/app.couples.jsx";
 import ReproductionsPage from "@/pages/app.reproductions.jsx";
 import SortiesPage from "@/pages/app.sorties.jsx";
-
 export default function App() {
   return (
     <Provider store={store}>
