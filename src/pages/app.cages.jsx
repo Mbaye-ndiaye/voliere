@@ -147,6 +147,22 @@ export default function CagesPage() {
     }
   };
 
+  const handleRompreCouple = async (cageId) => {
+    try {
+      await updateCage({
+        id: cageId,
+        patch: { 
+          couple_id: null
+        }
+      }).unwrap();
+      await refetch();
+      toast.success("Couple rompu avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la rupture du couple:", error);
+      toast.error("Erreur lors de la rupture du couple");
+    }
+  };
+
   const handleLibererCage = async (cageId) => {
     try {
       await updateCage({
@@ -225,17 +241,17 @@ export default function CagesPage() {
           <div className="mt-3 flex flex-wrap gap-4 text-sm">
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-green-500"></span>
-              Libre
+              Libre ()
             </div>
 
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-red-500"></span>
-              1 pigeon
+              Pigeon ()
             </div>
 
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-orange-500"></span>
-              Couple
+              Couple ()
             </div>
           </div>
         </div>
@@ -463,18 +479,29 @@ export default function CagesPage() {
               <div className="mt-6 border-t pt-4">
                 <h3 className="mb-3 font-semibold text-gray-700">Actions</h3>
                 <div className="flex flex-col gap-2">
-                  <button 
-                    onClick={handleOpenAssignPigeon}
-                    className="rounded-lg bg-sky-500 px-4 py-2 text-left text-sm text-white hover:bg-sky-600"
-                  >
-                    Affecter un pigeon
-                  </button>
-                  <button 
-                    onClick={handleOpenAssignCouple}
-                    className="rounded-lg bg-orange-500 px-4 py-2 text-left text-sm text-white hover:bg-orange-600"
-                  >
-                    Affecter un couple
-                  </button>
+                  {cageState(selected) !== "couple" && (
+                    <button 
+                      onClick={handleOpenAssignPigeon}
+                      className="rounded-lg bg-sky-500 px-4 py-2 text-left text-sm text-white hover:bg-sky-600"
+                    >
+                      Affecter un pigeon
+                    </button>
+                  )}
+                  {cageState(selected) === "couple" ? (
+                    <button 
+                      onClick={() => handleRompreCouple(selected.id)}
+                      className="rounded-lg bg-red-500 px-4 py-2 text-left text-sm text-white hover:bg-red-600"
+                    >
+                      Rompre le couple
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={handleOpenAssignCouple}
+                      className="rounded-lg bg-orange-500 px-4 py-2 text-left text-sm text-white hover:bg-orange-600"
+                    >
+                      Affecter un couple
+                    </button>
+                  )}
                   <button 
                     onClick={() => handleLibererCage(selected.id)}
                     className="rounded-lg bg-gray-500 px-4 py-2 text-left text-sm text-white hover:bg-gray-600"
