@@ -22,6 +22,7 @@ function Dashboard() {
     const { data: sorties = [] } = useGetSortiesQuery(undefined, { skip });
     const ventes = sorties.filter((s) => s.type === "vente");
     const revenu = ventes.reduce((acc, v) => acc + Number(v.price ?? 0), 0);
+    const totalSorties = sorties.length;
     if (skip) {
         return (_jsx("div", { className: "p-6 text-muted-foreground", children: "Session en cours de chargement\u2026 Si cela reste bloqu\u00E9, reconnectez-vous." }));
     }
@@ -62,7 +63,7 @@ function Dashboard() {
         },
         {
             label: "Sorties",
-            value: stats.sorties,
+            value: totalSorties,
             sub: `${ventes.length} ventes`,
             icon: DoorOpen,
             tint: "bg-secondary text-secondary-foreground",
