@@ -16,6 +16,12 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Baby, Plus } from "lucide-react";
 import {
   Select,
@@ -24,12 +30,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 function ReproductionsPage() {
   const { data: reproductions = [], isLoading } = useGetReproductionsQuery();
   const { data: couples = [] } = useGetCouplesQuery();
   const { data: pigeons = [] } = useGetPigeonsQuery();
   const [open, setOpen] = useState(false);
+  const [detailId, setDetailId] = useState(null);
+
+  const detailRepro = detailId != null 
+    ? reproductions.find((r) => r.id === detailId) ?? null 
+    : null;
 
   if (isLoading) {
     return (
@@ -73,7 +86,16 @@ function ReproductionsPage() {
           return (
             <div
               key={r.id}
-              className="bg-card rounded-2xl p-5 border border-border"
+              role="button"
+              tabIndex={0}
+              onClick={() => setDetailId(r.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setDetailId(r.id);
+                }
+              }}
+              className="bg-card rounded-2xl p-5 border border-border cursor-pointer transition hover:border-primary/40 hover:ring-1 hover:ring-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               style={{ boxShadow: "var(--shadow-soft)" }}
             >
               <div className="flex items-center gap-3">
@@ -115,7 +137,179 @@ function ReproductionsPage() {
           </p>
         )}
       </div>
+
+      <ReproductionDetailSheet
+        open={detailId != null}
+        onOpenChange={(o) => {
+          if (!o) setDetailId(null);
+        }}
+        reproduction={detailRepro}
+        couples={couples}
+        pigeons={pigeons}
+      />
     </div>
+  );
+}
+
+function ReproductionDetailSheet({ open, onOpenChange, reproduction, couples, pigeons }) {
+  if (!reproduction) return null;
+
+  const couple = couples.find((c) => c.id === reproduction.couple);
+  const m = couple 
+    ? (typeof couple.male === 'object' ? couple.male : pigeons.find((p) => p.id === couple.male))
+    : undefined;
+  const f = couple 
+    ? (typeof couple.female === 'object' ? couple.female : pigeons.find((p) => p.id === couple.female))
+    : undefined;
+
+  // Calculer la durée d'incubation si les deux dates sont présentes
+  const incubationDays = reproduction.hatch_date && reproduction.pond_date
+    ? Math.floor((new Date(reproduction.hatch_date) - new Date(reproduction.pond_date)) / (1000 * 60 * 60 * 24))
+    : null;
+
+  // Trouver les bébés si disponibles
+  const babies = reproduction.baby_ids 
+    ? pigeons.filter(p => reproduction.baby_ids.includes(p.id))
+    : [];
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="right"
+        className="w-full overflow-y-auto border-l p-0 sm:max-w-md"
+      >
+        <div className="flex h-full flex-col">
+          <SheetHeader className="border-b px-6 pb-4 pt-2">
+            <div className="flex items-start justify-between gap-2 pr-8">
+              <SheetTitle className="font-display text-xl">
+                Reproduction n°{reproduction.id}
+              </SheetTitle>
+            </div>
+            <Badge className="mt-2 w-fit" variant="default">
+              {reproduction.count} pigeonneau{reproduction.count > 1 ? "x" : ""}
+            </Badge>
+          </SheetHeader>
+
+          <div className="flex-1 space-y-6 overflow-y-auto px-6 py-4">
+            {/* Informations du couple */}
+            <section>
+              <h3 className="mb-3 text-sm font-semibold tracking-tight">
+                Couple parental
+              </h3>
+              <div className="rounded-xl border border-border bg-muted/30 p-4">
+                <div className="text-center mb-3">
+                  <div className="text-sm font-medium">Couple #{reproduction.couple}</div>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-center flex-1 text-sm">
+                    <div className="font-bold text-base">♂ Mâle</div>
+                    <div className="text-xs text-muted-foreground mt-1">{m?.bague ?? "—"}</div>
+                    {m && (
+                      <div className="text-xs text-muted-foreground">
+                        {m.race}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-2xl">×</div>
+                  <div className="text-center flex-1 text-sm">
+                    <div className="font-bold text-base">♀ Femelle</div>
+                    <div className="text-xs text-muted-foreground mt-1">{f?.bague ?? "—"}</div>
+                    {f && (
+                      <div className="text-xs text-muted-foreground">
+                        {f.race}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Dates importantes */}
+            <section>
+              <h3 className="mb-3 text-sm font-semibold tracking-tight">
+                Chronologie
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 rounded-lg bg-muted/50">
+                  <span className="text-sm text-muted-foreground">Date de ponte</span>
+                  <span className="font-medium">
+                    {new Date(reproduction.pond_date).toLocaleDateString("fr-FR")}
+                  </span>
+                </div>
+                {reproduction.hatch_date && (
+                  <>
+                    <div className="flex justify-between items-center p-3 rounded-lg bg-muted/50">
+                      <span className="text-sm text-muted-foreground">Date d'éclosion</span>
+                      <span className="font-medium">
+                        {new Date(reproduction.hatch_date).toLocaleDateString("fr-FR")}
+                      </span>
+                    </div>
+                    {incubationDays && (
+                      <div className="flex justify-between items-center p-3 rounded-lg bg-accent/20">
+                        <span className="text-sm text-muted-foreground">Durée d'incubation</span>
+                        <span className="font-medium">
+                          {incubationDays} jour{incubationDays > 1 ? "s" : ""}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
+                {!reproduction.hatch_date && (
+                  <div className="p-3 rounded-lg bg-yellow-50 border border-yellow-200">
+                    <p className="text-sm text-yellow-800">
+                      En attente d'éclosion
+                    </p>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Pigeonneaux */}
+            <section>
+              <h3 className="mb-3 text-sm font-semibold tracking-tight">
+                Pigeonneaux ({reproduction.count})
+              </h3>
+              {babies.length > 0 ? (
+                <div className="space-y-2">
+                  {babies.map((baby) => (
+                    <div
+                      key={baby.id}
+                      className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-accent/30 flex items-center justify-center">
+                        <Baby className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium">{baby.bague}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {baby.race} • {baby.sex === "M" ? "Mâle" : "Femelle"}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 rounded-lg border border-dashed text-center text-sm text-muted-foreground">
+                  Aucun pigeonneau enregistré
+                </div>
+              )}
+            </section>
+
+            {/* Notes */}
+            {reproduction.notes && (
+              <section>
+                <h3 className="mb-3 text-sm font-semibold tracking-tight">
+                  Notes
+                </h3>
+                <div className="p-3 rounded-lg bg-muted/50 text-sm">
+                  {reproduction.notes}
+                </div>
+              </section>
+            )}
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -137,15 +331,21 @@ function ReproForm({ onClose }) {
     e.preventDefault();
     if (!coupleId) return;
 
-    await createReproduction({
-      couple: parseInt(coupleId, 10),
-      pond_date: pondDate,
-      hatch_date: hatchDate || null,
-      count,
-      baby_ids: [],
-    }).unwrap();
+    try {
+      await createReproduction({
+        couple: parseInt(coupleId, 10),
+        pond_date: pondDate,
+        hatch_date: hatchDate || null,
+        count,
+        baby_ids: [],
+      }).unwrap();
 
-    onClose();
+      onClose();
+      toast.success("Reproduction enregistrée avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la création de la reproduction:", error);
+      toast.error("Erreur lors de l'enregistrement de la reproduction");
+    }
   };
 
   return (

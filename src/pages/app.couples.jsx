@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 
 export default function CouplesPage() {
   const { data: couples = [], isLoading, refetch } = useGetCouplesQuery();
@@ -48,9 +49,10 @@ export default function CouplesPage() {
     try {
       await updateCouple({ id, patch: { active: false } }).unwrap();
       await refetch();
+      toast.success("Couple dissous avec succès");
     } catch (error) {
       console.error("Erreur lors de la dissolution du couple:", error);
-      alert("Erreur lors de la dissolution du couple");
+      toast.error("Erreur lors de la dissolution du couple");
     }
   };
 
@@ -346,9 +348,10 @@ function CoupleForm({ onClose, onSuccess }) {
       setDate(new Date().toISOString().slice(0, 10));
       onClose();
       if (onSuccess) onSuccess();
+      toast.success("Couple créé avec succès");
     } catch (error) {
       console.error("Erreur lors de la création du couple:", error);
-      alert("Erreur lors de la création du couple");
+      toast.error("Erreur lors de la création du couple");
     }
   };
 

@@ -12,7 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Plus, Bird } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
+import {toast} from "sonner";
 const statusColor = {
     actif: "bg-cage-free/30 text-cage-free-foreground border-cage-free",
     vendu: "bg-accent text-accent-foreground border-accent",
@@ -95,10 +95,11 @@ function PigeonForm({ onClose }) {
                 parent_male: parentMaleId ? parseInt(parentMaleId, 10) : null,
                 parent_female: parentFemaleId ? parseInt(parentFemaleId, 10) : null,
             }).unwrap();
+            toast.success("Pigeon enregistré avec succès");
             onClose();
         }
         catch {
-            /* toast possible */
+            toast.error("Erreur lors de l'enregistrement du pigeon");
         }
     };
     return (_jsxs(DialogContent, { children: [_jsx(DialogHeader, { children: _jsx(DialogTitle, { className: "font-display text-2xl", children: "Nouveau pigeon" }) }), _jsxs("form", { onSubmit: submit, className: "space-y-4", children: [_jsxs("div", { className: "grid grid-cols-2 gap-3", children: [_jsxs("div", { children: [_jsx(Label, { children: "Bague (auto si vide)" }), _jsx(Input, { value: bague, onChange: (e) => setBague(e.target.value), placeholder: "P006" })] }), _jsxs("div", { children: [_jsx(Label, { children: "Sexe" }), _jsxs(Select, { value: sex, onValueChange: (v) => setSex(v), children: [_jsx(SelectTrigger, { children: _jsx(SelectValue, {}) }), _jsxs(SelectContent, { children: [_jsx(SelectItem, { value: "M", children: "M\u00E2le" }), _jsx(SelectItem, { value: "F", children: "Femelle" })] })] })] })] }), _jsxs("div", { children: [_jsx(Label, { children: "Race" }), _jsx(Input, { value: race, onChange: (e) => setRace(e.target.value), required: true })] }), _jsxs("div", { children: [_jsx(Label, { children: "Date de naissance" }), _jsx(Input, { type: "date", value: birthDate, onChange: (e) => setBirthDate(e.target.value), required: true })] }), _jsxs("div", { className: "grid grid-cols-2 gap-3", children: [_jsxs("div", { children: [_jsx(Label, { children: "P\u00E8re" }), _jsxs(Select, { value: parentMaleId || "none", onValueChange: (v) => setParentMaleId(v === "none" ? "" : v), children: [_jsx(SelectTrigger, { children: _jsx(SelectValue, { placeholder: "\u2014" }) }), _jsxs(SelectContent, { children: [_jsx(SelectItem, { value: "none", children: "\u2014" }), males.map((p) => (_jsx(SelectItem, { value: String(p.id), children: p.bague }, p.id)))] })] })] }), _jsxs("div", { children: [_jsx(Label, { children: "M\u00E8re" }), _jsxs(Select, { value: parentFemaleId || "none", onValueChange: (v) => setParentFemaleId(v === "none" ? "" : v), children: [_jsx(SelectTrigger, { children: _jsx(SelectValue, { placeholder: "\u2014" }) }), _jsxs(SelectContent, { children: [_jsx(SelectItem, { value: "none", children: "\u2014" }), femelles.map((p) => (_jsx(SelectItem, { value: String(p.id), children: p.bague }, p.id)))] })] })] })] }), _jsxs(DialogFooter, { children: [_jsx(Button, { type: "button", variant: "ghost", onClick: onClose, children: "Annuler" }), _jsx(Button, { type: "submit", disabled: isLoading, children: "Enregistrer" })] })] })] }));

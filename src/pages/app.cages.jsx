@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { useGetCagesQuery, useGetPigeonsQuery, useGetCouplesQuery, useAddCageMutation, useUpdateCageMutation } from "@/lib/redux/voliereApi";
+import { toast } from "sonner";
 
 function cageDisplayId(code) {
   return code;
@@ -105,9 +106,10 @@ export default function CagesPage() {
       setNewCageCouple("");
       setShowAddModal(false);
       await refetch();
+      toast.success("Cage ajoutée avec succès");
     } catch (error) {
       console.error("Erreur lors de l'ajout de la cage:", error);
-      alert("Erreur lors de l'ajout de la cage. Vérifiez que le code est unique.");
+      toast.error("Erreur lors de l'ajout de la cage. Vérifiez que le code est unique.");
     }
   };
 
@@ -121,10 +123,10 @@ export default function CagesPage() {
         }
       }).unwrap();
       await refetch();
-      alert("Pigeon affecté avec succès !");
+      toast.success("Pigeon affecté avec succès");
     } catch (error) {
       console.error("Erreur lors de l'affectation:", error);
-      alert("Erreur lors de l'affectation du pigeon");
+      toast.error("Erreur lors de l'affectation du pigeon");
     }
   };
 
@@ -138,10 +140,26 @@ export default function CagesPage() {
         }
       }).unwrap();
       await refetch();
-      alert("Couple affecté avec succès !");
+      toast.success("Couple affecté avec succès");
     } catch (error) {
       console.error("Erreur lors de l'affectation:", error);
-      alert("Erreur lors de l'affectation du couple");
+      toast.error("Erreur lors de l'affectation du couple");
+    }
+  };
+
+  const handleRompreCouple = async (cageId) => {
+    try {
+      await updateCage({
+        id: cageId,
+        patch: { 
+          couple_id: null
+        }
+      }).unwrap();
+      await refetch();
+      toast.success("Couple rompu avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la rupture du couple:", error);
+      toast.error("Erreur lors de la rupture du couple");
     }
   };
 
@@ -159,10 +177,10 @@ export default function CagesPage() {
       // Ajouter un événement dans l'historique si l'API le permet
       // await createHistoryEvent({ cageId, kind: "liberer" });
       
-      alert("Cage libérée avec succès !");
+      toast.success("Cage libérée avec succès");
     } catch (error) {
       console.error("Erreur lors de la libération:", error);
-      alert("Erreur lors de la libération de la cage");
+      toast.error("Erreur lors de la libération de la cage");
     }
   };
 
@@ -223,17 +241,17 @@ export default function CagesPage() {
           <div className="mt-3 flex flex-wrap gap-4 text-sm">
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-green-500"></span>
-              Libre
+              Libre ()
             </div>
 
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-red-500"></span>
-              1 pigeon
+              Pigeon ()
             </div>
 
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-orange-500"></span>
-              Couple
+              Couple ()
             </div>
           </div>
         </div>
@@ -461,18 +479,29 @@ export default function CagesPage() {
               <div className="mt-6 border-t pt-4">
                 <h3 className="mb-3 font-semibold text-gray-700">Actions</h3>
                 <div className="flex flex-col gap-2">
-                  <button 
-                    onClick={handleOpenAssignPigeon}
-                    className="rounded-lg bg-sky-500 px-4 py-2 text-left text-sm text-white hover:bg-sky-600"
-                  >
-                    Affecter un pigeon
-                  </button>
-                  <button 
-                    onClick={handleOpenAssignCouple}
-                    className="rounded-lg bg-orange-500 px-4 py-2 text-left text-sm text-white hover:bg-orange-600"
-                  >
-                    Affecter un couple
-                  </button>
+                  {cageState(selected) !== "couple" && (
+                    <button 
+                      onClick={handleOpenAssignPigeon}
+                      className="rounded-lg bg-sky-500 px-4 py-2 text-left text-sm text-white hover:bg-sky-600"
+                    >
+                      Affecter un pigeon
+                    </button>
+                  )}
+                  {cageState(selected) === "couple" ? (
+                    <button 
+                      onClick={() => handleRompreCouple(selected.id)}
+                      className="rounded-lg bg-red-500 px-4 py-2 text-left text-sm text-white hover:bg-red-600"
+                    >
+                      Rompre le couple
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={handleOpenAssignCouple}
+                      className="rounded-lg bg-orange-500 px-4 py-2 text-left text-sm text-white hover:bg-orange-600"
+                    >
+                      Affecter un couple
+                    </button>
+                  )}
                   <button 
                     onClick={() => handleLibererCage(selected.id)}
                     className="rounded-lg bg-gray-500 px-4 py-2 text-left text-sm text-white hover:bg-gray-600"
